@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scheda Cliente</title>
 
-<!-- PWA meta (lasciati invariati) -->
-<meta name="mobile-web-app-capable" content="yes">
+<!-- PWA (lasciati invariati) -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="SB Training">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Scheda Cliente">
 <meta name="theme-color" content="#0c1a28">
 
 <style>
@@ -40,14 +40,14 @@ button.primary{background:var(--brand);color:#2d1600;border:none;font-weight:800
 .item{border:1px dashed var(--border);border-radius:12px;padding:10px;margin:10px 0}
 .item-grid{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr; /* 3 colonne: 1) nome/icona 2) serie 3) ripetizioni, poi Kg/Recupero sotto */
+  grid-template-columns:1fr 1fr 1fr; /* riga1: Nome/icona | Serie | Ripetizioni ; riga2: Kg | Recupero */
   gap:10px;
   align-items:start;
 }
-.item-name{display:flex;align-items:center;gap:10px}
-.item-name b{font-size:1.25em;line-height:1.1} /* NOME ESERCIZIO PIÙ GRANDE */
+.item-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.item-name b{font-size:1.25em;line-height:1.1} /* nome più grande */
 .ico-db{
-  width:24px;height:24px;flex:0 0 24px;      /* ICONA MANUBRIO PIÙ GRANDE */
+  width:24px;height:24px;flex:0 0 24px;      /* icona manubrio più grande */
   display:inline-block;vertical-align:middle
 }
 .lab{font-size:.95em;color:var(--muted);margin-bottom:4px}
@@ -55,7 +55,7 @@ button.primary{background:var(--brand);color:#2d1600;border:none;font-weight:800
 .val input[type="number"]{width:100%;min-width:0;background:#0b1220;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px}
 .val input.kg{outline:2px solid var(--ok);box-shadow:0 0 0 2px rgba(34,197,94,.25)}
 .tech{display:flex;gap:6px;align-items:center;margin-top:6px}
-.tech .tag{background:#132033;border:1px solid #1f334f;color:#cde1ff;padding:4px 8px;border-radius:999px;font-size:.9em;white-space:nowrap}
+.tag{background:#132033;border:1px solid #1f334f;color:#cde1ff;padding:4px 8px;border-radius:999px;font-size:.9em;white-space:nowrap}
 .sep{height:1px;background:#1c2a3d;margin:12px 0}
 .meta{font-size:.9em;color:var(--muted)}
 .note{font-size:.95em;color:#d6d6d6}
@@ -64,12 +64,6 @@ button.primary{background:var(--brand);color:#2d1600;border:none;font-weight:800
   .item-grid{grid-template-columns:1fr 1fr 1fr}
 }
 </style>
-
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="SB Training">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#ffffff">
 </head>
 <body>
 <div class="wrap">
@@ -104,10 +98,9 @@ const SVG_DBELL = `
 
 let plan=null;
 
-/* ➊ Persistenza locale */
-const LS_OVR_KEY='client_overrides_v19';      // Kg/Settimana (già esistente)
-const LS_PLAN_KEY='client_saved_plan_v1';     // NUOVO: ultima scheda caricata
-
+/* Persistenza locale */
+const LS_OVR_KEY='client_overrides_v19';      // Kg/Settimana
+const LS_PLAN_KEY='client_saved_plan_v1';     // Ultima scheda caricata
 let localOver=null;
 function loadOverrides(){
   try{ localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||{weekByDayId:{},kgByItemId:{}}; }
@@ -116,42 +109,44 @@ function loadOverrides(){
 function saveOverrides(){ localStorage.setItem(LS_OVR_KEY, JSON.stringify(localOver)); }
 loadOverrides();
 
-function savePlan(p){ try{ localStorage.setItem(LS_PLAN_KEY, JSON.stringify({plan:p})); }catch{} }
-function loadSavedPlan(){
-  try{
-    const raw = localStorage.getItem(LS_PLAN_KEY);
-    if(!raw) return null;
-    const data = JSON.parse(raw);
-    return data.plan || data;
-  }catch{ return null; }
-}
-
-function findPairedExerciseName(item){
-  let pairName = item.techPairName || item.techniquePairName || item.pairedExerciseName || item.pairExerciseName || item.tech_exercise || '';
-  let pairId   = item.techPairId   || item.techniquePairId   || item.pairedExerciseId   || item.pairExerciseId   || item.tech_ref       || '';
-  if(!pairName && pairId){
-    if(plan && Array.isArray(plan.exercises)){
-      const e = plan.exercises.find(x=>x.id===pairId);
-      if(e) pairName = e.name || '';
-    }
-    if(!pairName && plan && Array.isArray(plan.days)){
-      for(const d of plan.days){
-        const hit = (d.items||[]).find(x=>x.exerciseId===pairId);
-        if(hit){ pairName = hit.exerciseName || ''; break; }
-      }
-    }
+/* ---- NOVITÀ: lettura ATTREZZO ---- */
+function readEquipmentFromItem(it){
+  // nomi campo tipici
+  const keys = [
+    'equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'
+  ];
+  for(const k of keys){
+    if(it && it[k]) return String(it[k]);
   }
-  if(!pairName && item.pairedName) pairName=item.pairedName;
-  return pairName;
+  return '';
 }
+function readEquipmentFromLibrary(exerciseId){
+  if(!exerciseId || !plan || !Array.isArray(plan.exercises)) return '';
+  const lib = plan.exercises.find(e=>e.id===exerciseId || e.exerciseId===exerciseId);
+  if(!lib) return '';
+  const keys = ['equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'];
+  for(const k of keys){
+    if(lib[k]) return String(lib[k]);
+  }
+  // a volte dentro meta/tags
+  if(lib.meta && (lib.meta.equipment || lib.meta.attrezzo)) return String(lib.meta.equipment||lib.meta.attrezzo);
+  return '';
+}
+function getEquipment(it){
+  let eq = readEquipmentFromItem(it);
+  if(!eq){
+    eq = readEquipmentFromLibrary(it.exerciseId || it.id);
+  }
+  return eq ? eq.trim() : '';
+}
+/* ----------------------------------- */
 
 function techniqueLabel(item){
   const t = item.technique || item.tecnica || '';
   if(!t) return '';
-  const pair = findPairedExerciseName(item);
+  const pair = (item.techPairName || item.techniquePairName || item.pairedExerciseName || item.pairExerciseName || item.pairedName || '');
   return pair ? `${t} → ${pair}` : t;
 }
-
 function hhmm(min,sec){
   if(!min && !sec) return '-';
   const mm = String(min||0).padStart(2,'0');
@@ -181,7 +176,7 @@ function render(){
           <input type="number" min="1" step="1" value="${weekNum}" data-week="${dayId}">
         </div>
       </div>
-      ${ (day.items||[]).map((it)=>renderItem(dayId,it)).join('<div class="sep"></div>') }
+      ${ (day.items||[]).map((it)=>renderItem(it)).join('<div class="sep"></div>') }
     </div>`;
   });
 
@@ -213,12 +208,16 @@ function render(){
   });
 }
 
-function renderItem(dayId, it){
+function renderItem(it){
   const name = esc(it.exerciseName || it.name || 'Esercizio');
   const kgId = esc(it.id || it.itemId || ('it_'+Math.random().toString(36).slice(2)));
   const tech = techniqueLabel(it);
   const notes = esc(it.notes || it.note || '');
   const rest = hhmm(it.restMin, it.restSec);
+
+  // NOVITÀ: attrezzo (badge)
+  const eqRaw = getEquipment(it);
+  const eq = eqRaw ? esc(eqRaw) : '';
 
   return `
   <div class="item" data-item="${kgId}">
@@ -230,8 +229,9 @@ function renderItem(dayId, it){
         <div class="item-name">
           ${SVG_DBELL}
           <b>${name}</b>
+          ${eq ? `<span class="tag" title="Attrezzo">${eq}</span>` : ``}
         </div>
-        ${tech? `<div class="tech"><span class="tag">${esc(tech)}</span></div>`:''}
+        ${tech? `<div class="tech"><span class="tag">${tech}</span></div>`:''}
       </div>
 
       <!-- Serie -->
@@ -258,7 +258,7 @@ function renderItem(dayId, it){
         <div class="val"><span>${rest}</span></div>
       </div>
 
-      <!-- NOTE -->
+      <!-- Note -->
       ${notes ? `
       <div class="note" style="grid-column:1/-1;margin-top:4px">
         <span class="lab" style="display:block;margin:0 0 2px">Note</span>
@@ -269,7 +269,7 @@ function renderItem(dayId, it){
   </div>`;
 }
 
-/* Importa e SALVA la scheda */
+/* Importa e salva la scheda */
 function importPlan(){
   const inp = Object.assign(document.createElement('input'), {type:'file', accept:'.ptplan,.json,application/json'});
   inp.onchange = async ()=>{
@@ -280,7 +280,7 @@ function importPlan(){
       const p = data.plan || data;
       if(!p || !Array.isArray(p.days)) throw new Error('File non valido: mancano i giorni.');
       plan = p;
-      savePlan(p);   // <— SALVA la scheda per riapertura automatica
+      try{ localStorage.setItem(LS_PLAN_KEY, JSON.stringify({plan:p})); }catch{}
       render();
       alert('Scheda importata.');
     }catch(e){
@@ -303,15 +303,19 @@ function resetLocal(){
   render();
 }
 
-/* Avvio: se esiste una scheda salvata, caricala automaticamente */
+/* Avvio: ricarica l'ultima scheda salvata se esiste */
 (function init(){
-  const saved = loadSavedPlan();
-  if(saved && Array.isArray(saved.days)){
-    plan = saved;
-    render();
-  }else{
-    render(); // mostra messaggio “Importa il file…”
-  }
+  try{
+    const raw = localStorage.getItem(LS_PLAN_KEY);
+    if(raw){
+      const data = JSON.parse(raw);
+      const saved = data.plan || data;
+      if(saved && Array.isArray(saved.days)){
+        plan = saved;
+      }
+    }
+  }catch{}
+  render();
 })();
 
 $('#btn-import').addEventListener('click', importPlan);
@@ -321,6 +325,7 @@ $('#btn-reset').addEventListener('click', resetLocal);
 })();
 </script>
 
+<!-- Registra il service worker (necessario per installazione/icone) -->
 <script src="sw-register.js" defer></script>
 </body>
 </html>
