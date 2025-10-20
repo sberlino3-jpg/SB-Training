@@ -18,10 +18,11 @@
   --text:#0f1a2d;
   --muted:#6c7480;
   --border:#d2d2d2;
-  --border-strong:#b3b3b3; /* ✅ Bordo più marcato */
+  --border-strong:#b3b3b3;
   --accent:#4864aa;
   --brand:#a01818;
   --ok:#2ea44f;
+  --divider:#b22222; /* ✅ linea di separazione tra giorni */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Inter',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
@@ -43,19 +44,38 @@ button.primary{border-color:var(--brand);color:var(--brand);}
 button.primary:hover{background:var(--brand);color:#fff}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:16px;}
 
-/* ✅ Giorni con separazione più visibile */
+/* ✅ Giorni più separati visivamente */
 .day{
   background:var(--card);
   border:2px solid var(--border-strong);
   border-radius:12px;
   padding:18px;
-  margin:24px 0;
+  margin:28px 0;
   box-shadow:0 3px 8px rgba(0,0,0,0.08);
+  position:relative;
 }
 
-/* Intestazione Giorno */
+/* ✅ Divisore colorato tra i giorni */
+.day::after{
+  content:"";
+  display:block;
+  height:4px;
+  width:100%;
+  background:var(--divider);
+  border-radius:4px;
+  position:absolute;
+  bottom:-14px;
+  left:0;
+}
+
+/* Titolo giorno più grande */
+.day-title h2{
+  margin:0;
+  font-size:1.4rem; /* ✅ più grande */
+  font-weight:700;
+  color:#000;
+}
 .day-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.day-title h2{margin:0;font-size:1.2rem;color:#000;}
 .week-edit{display:flex;align-items:center;gap:8px}
 .week-edit .label{font-weight:600;color:var(--text)}
 .week-edit input{
@@ -67,7 +87,7 @@ button.primary:hover{background:var(--brand);color:#fff}
   color:var(--text);
 }
 
-/* ✅ Riquadro esercizio più marcato */
+/* Riquadro esercizio marcato */
 .item{
   border:2px solid var(--border-strong);
   border-radius:10px;
@@ -129,7 +149,6 @@ button.primary:hover{background:var(--brand);color:#fff}
 .meta{font-size:0.9rem;color:var(--muted);}
 .tech{margin-top:6px}
 
-/* Icone centrali */
 .grid{
   display:grid;
   grid-template-columns: repeat(3, 90px);
@@ -142,7 +161,7 @@ button.primary:hover{background:var(--brand);color:#fff}
 @media(max-width:600px){
   .item{padding:12px}
   .day{padding:12px}
-  .day-title h2{font-size:1.05rem}
+  .day-title h2{font-size:1.25rem}
   .grid{gap:10px}
 }
 </style>
