@@ -87,13 +87,13 @@ button.primary:hover{background:var(--brand);color:#fff}
   text-align:center;
 }
 .val input[type="number"]{
-  width:100%;
-  min-width:90px; /* campo Kg più largo */
+  width:70px; /* uniforme con gli altri box */
   background:#fff;
   color:var(--text);
   border:2px solid var(--border);
   border-radius:6px;
-  padding:6px 8px;
+  padding:6px 0;
+  text-align:center; /* centrato */
   transition:border .2s;
 }
 .val input.kg{border-color:var(--ok)}
@@ -113,7 +113,7 @@ button.primary:hover{background:var(--brand);color:#fff}
   .item{padding:12px}
   .day{padding:12px}
   .day-title h2{font-size:1.05rem}
-  .val input[type="number"]{min-width:100px;}
+  .val input[type="number"]{width:70px;} /* stessa misura anche su mobile */
 }
 </style>
 </head>
@@ -215,7 +215,6 @@ function renderItem(it){
   const rest=hhmm(it.restMin,it.restSec);
   const eq=getEquipment(it);
 
-  // Serie e Ripetizioni insieme
   const series=it.sets??'';
   const reps=it.reps??'';
   const combo=series&&reps?`${series}×${reps}`:(series||reps||'');
@@ -225,7 +224,7 @@ function renderItem(it){
     <div class="item-name">${SVG_DBELL}<b>${name}</b>${eq?`<span class="tag">${esc(eq)}</span>`:''}</div>
     ${tech?`<div class="tech"><span class="tag">${esc(tech)}</span></div>`:''}
     <div class="sep"></div>
-    <div class="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;">
+    <div class="grid" style="display:grid;grid-template-columns:repeat(3,auto);gap:12px;justify-content:center;margin-top:8px;">
       <div><div class="lab">Serie/Rep</div><div class="val">${combo}</div></div>
       <div><div class="lab">Kg</div><div class="val"><input class="kg" data-kg="${kgId}" type="number" step="0.5" value="${esc(it.kg??'')}"></div></div>
       <div><div class="lab">Rec</div><div class="val">${rest}</div></div>
