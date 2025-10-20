@@ -17,7 +17,8 @@
   --card:#ffffff;
   --text:#0f1a2d;
   --muted:#6c7480;
-  --border:#e4e4e4;
+  --border:#d2d2d2;
+  --border-strong:#b3b3b3; /* ✅ Bordo più marcato */
   --accent:#4864aa;
   --brand:#a01818;
   --ok:#2ea44f;
@@ -41,8 +42,19 @@ button:hover{background:var(--accent);color:#fff}
 button.primary{border-color:var(--brand);color:var(--brand);}
 button.primary:hover{background:var(--brand);color:#fff}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:16px;}
-.day{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin:20px 0;box-shadow:0 2px 4px rgba(0,0,0,0.04);}
-.day-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+
+/* ✅ Giorni con separazione più visibile */
+.day{
+  background:var(--card);
+  border:2px solid var(--border-strong);
+  border-radius:12px;
+  padding:18px;
+  margin:24px 0;
+  box-shadow:0 3px 8px rgba(0,0,0,0.08);
+}
+
+/* Intestazione Giorno */
+.day-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .day-title h2{margin:0;font-size:1.2rem;color:#000;}
 .week-edit{display:flex;align-items:center;gap:8px}
 .week-edit .label{font-weight:600;color:var(--text)}
@@ -55,7 +67,15 @@ button.primary:hover{background:var(--brand);color:#fff}
   color:var(--text);
 }
 
-.item{border:1px solid var(--border);border-radius:10px;padding:14px;margin:14px 0;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+/* ✅ Riquadro esercizio più marcato */
+.item{
+  border:2px solid var(--border-strong);
+  border-radius:10px;
+  padding:16px;
+  margin:16px 0;
+  background:var(--card);
+  box-shadow:0 2px 5px rgba(0,0,0,0.06);
+}
 .item-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .item-name b{font-size:1.1rem;color:var(--text);}
 .ico-db{width:22px;height:22px;flex:0 0 22px}
@@ -76,7 +96,7 @@ button.primary:hover{background:var(--brand);color:#fff}
   padding:4px 8px;
   text-align:center;
   width:90px;
-  overflow:hidden;         /* ✅ Evita che il testo esca dai bordi */
+  overflow:hidden;
   white-space:nowrap;
   text-overflow:ellipsis;
 }
@@ -109,6 +129,7 @@ button.primary:hover{background:var(--brand);color:#fff}
 .meta{font-size:0.9rem;color:var(--muted);}
 .tech{margin-top:6px}
 
+/* Icone centrali */
 .grid{
   display:grid;
   grid-template-columns: repeat(3, 90px);
