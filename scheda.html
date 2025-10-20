@@ -5,70 +5,121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scheda Cliente</title>
 
-<!-- PWA (lasciati invariati) -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="SB Training">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0c1a28">
+<meta name="theme-color" content="#faf7f2">
 
 <style>
 :root{
-  --bg:#0f172a;--panel:#111827;--text:#e5e7eb;--muted:#94a3b8;--border:#1f2937;
-  --brand:#ff7a1a;--ok:#22c55e;
+  --bg:#faf7f2;
+  --card:#ffffff;
+  --text:#0f1a2d;
+  --muted:#6c7480;
+  --border:#e4e4e4;
+  --accent:#4864aa;
+  --brand:#a01818; /* rosso scuro amaranto */
+  --ok:#2ea44f;
   --fs:clamp(12px,1.05vw,15px);
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:var(--fs) Inter,system-ui,Arial}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
 button,input{font:inherit}
-.wrap{max-width:1100px;margin:0 auto;padding:14px}
-.header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap}
-button{background:#0b1220;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer}
-button.primary{background:var(--brand);color:#2d1600;border:none;font-weight:800}
-.card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0));border:1px solid var(--border);border-radius:12px;padding:12px}
-.day{border:1px solid var(--border);border-radius:12px;padding:12px;margin:14px 0;background:#0b1220}
-.day-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
-.day-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.day-title h2{margin:0;font-size:20px}
-.week-edit{display:flex;align-items:center;gap:10px}
-.week-edit .label{font-weight:700;color:var(--text);letter-spacing:.02em}
-.week-edit input{width:72px;text-align:center;background:#0b1220;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:6px 8px}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap}
+button{
+  border:1.5px solid var(--accent);
+  background:transparent;
+  color:var(--accent);
+  border-radius:8px;
+  padding:8px 14px;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+button:hover{background:var(--accent);color:#fff}
+button.primary{
+  border-color:var(--brand);
+  color:var(--brand);
+}
+button.primary:hover{background:var(--brand);color:#fff}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:16px;}
+.day{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin:20px 0;box-shadow:0 2px 4px rgba(0,0,0,0.04);}
+.day-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.day-title h2{margin:0;font-size:1.2rem;color:#000;} /* Giorno in nero */
+.week-edit{display:flex;align-items:center;gap:8px}
+.week-edit .label{font-weight:600;color:var(--text)}
+.week-edit input{
+  width:70px;text-align:center;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:6px 8px;
+  background:#fff;
+  color:var(--text);
+}
 
-/* CARD ESERCIZIO */
-.item{border:1px dashed var(--border);border-radius:12px;padding:10px;margin:10px 0}
-.item-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr; /* riga1: Nome/icona | Serie | Ripetizioni ; riga2: Kg | Recupero */
-  gap:10px;
-  align-items:start;
-}
+.item{border:1px solid var(--border);border-radius:10px;padding:14px;margin:14px 0;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.05);}
 .item-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.item-name b{font-size:1.25em;line-height:1.1} /* nome più grande */
-.ico-db{
-  width:24px;height:24px;flex:0 0 24px;      /* icona manubrio più grande */
-  display:inline-block;vertical-align:middle
+.item-name b{font-size:1.1rem;color:var(--text);}
+.ico-db{width:22px;height:22px;flex:0 0 22px}
+.tag{
+  background:#f0f2f5;
+  color:var(--accent);
+  border-radius:999px;
+  font-size:0.85rem;
+  padding:3px 8px;
 }
-.lab{font-size:.95em;color:var(--muted);margin-bottom:4px}
-.val{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.val input[type="number"]{width:100%;min-width:0;background:#0b1220;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px}
-.val input.kg{outline:2px solid var(--ok);box-shadow:0 0 0 2px rgba(34,197,94,.25)}
-.tech{display:flex;gap:6px;align-items:center;margin-top:6px}
-.tag{background:#132033;border:1px solid #1f334f;color:#cde1ff;padding:4px 8px;border-radius:999px;font-size:.9em;white-space:nowrap}
-.sep{height:1px;background:#1c2a3d;margin:12px 0}
-.meta{font-size:.9em;color:var(--muted)}
-.note{font-size:.95em;color:#d6d6d6}
-.print-note{white-space:pre-wrap}
-@media(max-width:820px){
-  .item-grid{grid-template-columns:1fr 1fr 1fr}
+.lab{
+  font-size:.9rem;
+  font-weight:600;
+  color:#fff;
+  background:var(--brand);
+  border:1px solid #000; /* bordo nero sottile */
+  border-radius:3px; /* meno arrotondate */
+  padding:4px 8px;
+  text-align:center;
+}
+.val{
+  font-size:1rem;
+  font-weight:600;
+  color:var(--text);
+  text-align:center;
+}
+.val input[type="number"]{
+  width:100%;
+  background:#fff;
+  color:var(--text);
+  border:2px solid var(--border);
+  border-radius:6px;
+  padding:6px 8px;
+  transition:border .2s;
+}
+.val input.kg{border-color:var(--ok)}
+.val input[type="number"]:focus{border-color:var(--brand);outline:none}
+.sep{height:1px;background:#ececec;margin:12px 0}
+.note{
+  background:#f9f9f9;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:0.95rem;
+  color:#2b2b2b;
+  font-weight:600;
+}
+.meta{font-size:0.9rem;color:var(--muted);}
+.tech{margin-top:6px}
+@media(max-width:600px){
+  .item{padding:12px}
+  .day{padding:12px}
+  .day-title h2{font-size:1.05rem}
 }
 </style>
 </head>
+
 <body>
 <div class="wrap">
   <div class="header">
-    <h1 style="margin:0">Scheda Cliente</h1>
+    <h1>Scheda Cliente</h1>
     <div class="toolbar">
       <button id="btn-import" class="primary" type="button">Importa scheda (.ptplan)</button>
       <button id="btn-print" type="button">Stampa / PDF</button>
@@ -84,248 +135,132 @@ button.primary{background:var(--brand);color:#2d1600;border:none;font-weight:800
 <script>
 (function(){
 'use strict';
-
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-
-// Icona manubrio accanto al nome esercizio
-const SVG_DBELL = `
-<svg class="ico-db" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
-  <rect x="1.5" y="6" width="4" height="12" rx="1.5" fill="#94a3b8"/>
-  <rect x="18.5" y="6" width="4" height="12" rx="1.5" fill="#94a3b8"/>
-  <rect x="6" y="10.5" width="12" height="3" rx="1.5" fill="#e5e7eb"/>
-</svg>`;
-
+const SVG_DBELL=`<svg class="ico-db" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="1.5" y="6" width="4" height="12" rx="1" fill="#a01818" stroke="#000" stroke-width="0.5"/><rect x="18.5" y="6" width="4" height="12" rx="1" fill="#a01818" stroke="#000" stroke-width="0.5"/><rect x="6" y="10.5" width="12" height="3" rx="1" fill="#6b0000" stroke="#000" stroke-width="0.5"/></svg>`;
 let plan=null;
+const LS_OVR_KEY='client_overrides_v19';
+const LS_PLAN_KEY='client_saved_plan_v1';
+let localOver={weekByDayId:{},kgByItemId:{}};
+try{localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||localOver;}catch{}
 
-/* Persistenza locale */
-const LS_OVR_KEY='client_overrides_v19';      // Kg/Settimana
-const LS_PLAN_KEY='client_saved_plan_v1';     // Ultima scheda caricata
-let localOver=null;
-function loadOverrides(){
-  try{ localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||{weekByDayId:{},kgByItemId:{}}; }
-  catch{ localOver={weekByDayId:{},kgByItemId:{}}; }
-}
-function saveOverrides(){ localStorage.setItem(LS_OVR_KEY, JSON.stringify(localOver)); }
-loadOverrides();
+function saveOverrides(){localStorage.setItem(LS_OVR_KEY,JSON.stringify(localOver));}
 
-/* ---- NOVITÀ: lettura ATTREZZO ---- */
 function readEquipmentFromItem(it){
-  // nomi campo tipici
-  const keys = [
-    'equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'
-  ];
-  for(const k of keys){
-    if(it && it[k]) return String(it[k]);
-  }
-  return '';
+  const keys=['equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'];
+  for(const k of keys){if(it&&it[k])return String(it[k]);}return'';
 }
 function readEquipmentFromLibrary(exerciseId){
-  if(!exerciseId || !plan || !Array.isArray(plan.exercises)) return '';
-  const lib = plan.exercises.find(e=>e.id===exerciseId || e.exerciseId===exerciseId);
-  if(!lib) return '';
-  const keys = ['equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'];
-  for(const k of keys){
-    if(lib[k]) return String(lib[k]);
-  }
-  // a volte dentro meta/tags
-  if(lib.meta && (lib.meta.equipment || lib.meta.attrezzo)) return String(lib.meta.equipment||lib.meta.attrezzo);
-  return '';
+  if(!exerciseId||!plan||!Array.isArray(plan.exercises))return'';
+  const lib=plan.exercises.find(e=>e.id===exerciseId||e.exerciseId===exerciseId);
+  if(!lib)return'';
+  const keys=['equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'];
+  for(const k of keys){if(lib[k])return String(lib[k]);}
+  if(lib.meta&&(lib.meta.equipment||lib.meta.attrezzo))return String(lib.meta.equipment||lib.meta.attrezzo);
+  return'';
 }
-function getEquipment(it){
-  let eq = readEquipmentFromItem(it);
-  if(!eq){
-    eq = readEquipmentFromLibrary(it.exerciseId || it.id);
-  }
-  return eq ? eq.trim() : '';
-}
-/* ----------------------------------- */
-
-function techniqueLabel(item){
-  const t = item.technique || item.tecnica || '';
-  if(!t) return '';
-  const pair = (item.techPairName || item.techniquePairName || item.pairedExerciseName || item.pairExerciseName || item.pairedName || '');
-  return pair ? `${t} → ${pair}` : t;
-}
-function hhmm(min,sec){
-  if(!min && !sec) return '-';
-  const mm = String(min||0).padStart(2,'0');
-  const ss = String(sec||0).padStart(2,'0');
-  return `${mm}:${ss}`;
-}
+function getEquipment(it){return readEquipmentFromItem(it)||readEquipmentFromLibrary(it.exerciseId||it.id)||'';}
+function techniqueLabel(item){const t=item.technique||item.tecnica||'';if(!t)return'';const p=item.techPairName||item.pairedExerciseName||'';return p?`${t} → ${p}`:t;}
+function hhmm(m,s){if(!m&&!s)return'-';const mm=String(m||0).padStart(2,'0');const ss=String(s||0).padStart(2,'0');return`${mm}:${ss}`;}
 
 function render(){
-  const host = $('#content');
-  if(!plan){ host.innerHTML = `<p class="meta">Importa il file .ptplan ricevuto dal coach per visualizzare la scheda. Potrai modificare solo i <b>Kg</b> e il numero di <b>Settimana</b>.</p>`; return; }
-
-  const title = esc(plan.title || plan.client || 'Scheda');
-  let html = `<h2 style="margin:0 0 8px">${title}</h2>`;
-
+  const host=$('#content');
+  if(!plan){host.innerHTML=`<p class="meta">Importa il file .ptplan ricevuto dal coach per visualizzare la scheda.</p>`;return;}
+  const title=esc(plan.title||plan.client||'Scheda');
+  let html=`<h2 style="margin-bottom:10px;font-weight:600">${title}</h2>`;
   (plan.days||[]).forEach(day=>{
-    const dayId = day.id || day.dayId || ('d_'+Math.random().toString(36).slice(2));
-    const weekNum = localOver.weekByDayId[dayId] ?? day.week ?? 1;
-    const dayName = esc(day.name || '');
-    html += `
+    const dayId=day.id||day.dayId||('d_'+Math.random().toString(36).slice(2));
+    const weekNum=localOver.weekByDayId[dayId]??day.week??1;
+    const dayName=esc(day.name||'');
+    html+=`
     <div class="day" data-day="${dayId}">
       <div class="day-head">
-        <div class="day-title">
-          <h2>${dayName}</h2>
-        </div>
+        <div class="day-title"><h2>${dayName}</h2></div>
         <div class="week-edit">
           <span class="label">SETTIMANA</span>
           <input type="number" min="1" step="1" value="${weekNum}" data-week="${dayId}">
         </div>
       </div>
-      ${ (day.items||[]).map((it)=>renderItem(it)).join('<div class="sep"></div>') }
+      ${(day.items||[]).map(it=>renderItem(it)).join('<div class="sep"></div>')}
     </div>`;
   });
-
-  host.innerHTML = html;
-
-  // wiring settimane / kg
+  host.innerHTML=html;
   (plan.days||[]).forEach(day=>{
-    const dayId = day.id || day.dayId;
-    const wkInp = host.querySelector(`input[data-week="${CSS.escape(dayId)}"]`);
-    if(wkInp){
-      wkInp.addEventListener('input', ()=>{
-        let v = parseInt(wkInp.value,10);
-        if(isNaN(v)||v<1) v = 1;
-        localOver.weekByDayId[dayId]=v; saveOverrides();
-      });
-    }
+    const dayId=day.id||day.dayId;
+    const wkInp=host.querySelector(`input[data-week="${CSS.escape(dayId)}"]`);
+    if(wkInp)wkInp.addEventListener('input',()=>{
+      let v=parseInt(wkInp.value,10);if(isNaN(v)||v<1)v=1;
+      localOver.weekByDayId[dayId]=v;saveOverrides();
+    });
     (day.items||[]).forEach(it=>{
-      const kgId = it.id || it.itemId;
-      const inp = host.querySelector(`input[data-kg="${CSS.escape(kgId)}"]`);
+      const kgId=it.id||it.itemId;
+      const inp=host.querySelector(`input[data-kg="${CSS.escape(kgId)}"]`);
       if(inp){
-        const initial = localOver.kgByItemId[kgId];
-        if(initial!=null) inp.value = initial;
-        inp.addEventListener('input', ()=>{
-          localOver.kgByItemId[kgId] = inp.value;
-          saveOverrides();
+        const initial=localOver.kgByItemId[kgId];
+        if(initial!=null)inp.value=initial;
+        inp.addEventListener('input',()=>{
+          localOver.kgByItemId[kgId]=inp.value;saveOverrides();
         });
       }
     });
   });
 }
-
 function renderItem(it){
-  const name = esc(it.exerciseName || it.name || 'Esercizio');
-  const kgId = esc(it.id || it.itemId || ('it_'+Math.random().toString(36).slice(2)));
-  const tech = techniqueLabel(it);
-  const notes = esc(it.notes || it.note || '');
-  const rest = hhmm(it.restMin, it.restSec);
-
-  // NOVITÀ: attrezzo (badge)
-  const eqRaw = getEquipment(it);
-  const eq = eqRaw ? esc(eqRaw) : '';
-
-  return `
-  <div class="item" data-item="${kgId}">
-    <div class="item-grid">
-
-      <!-- Esercizio (label) + Nome con icona -->
-      <div>
-        <div class="lab">Esercizio</div>
-        <div class="item-name">
-          ${SVG_DBELL}
-          <b>${name}</b>
-          ${eq ? `<span class="tag" title="Attrezzo">${eq}</span>` : ``}
-        </div>
-        ${tech? `<div class="tech"><span class="tag">${tech}</span></div>`:''}
-      </div>
-
-      <!-- Serie -->
-      <div>
-        <div class="lab">Serie</div>
-        <div class="val"><span>${esc(it.sets ?? '')}</span></div>
-      </div>
-
-      <!-- Ripetizioni -->
-      <div>
-        <div class="lab">Ripetizioni</div>
-        <div class="val"><span>${esc(it.reps ?? '')}</span></div>
-      </div>
-
-      <!-- Kg -->
-      <div>
-        <div class="lab">Kg</div>
-        <div class="val"><input class="kg" data-kg="${kgId}" type="number" min="0" step="0.5" value="${esc(it.kg ?? '')}"></div>
-      </div>
-
-      <!-- Recupero -->
-      <div>
-        <div class="lab">Recupero</div>
-        <div class="val"><span>${rest}</span></div>
-      </div>
-
-      <!-- Note -->
-      ${notes ? `
-      <div class="note" style="grid-column:1/-1;margin-top:4px">
-        <span class="lab" style="display:block;margin:0 0 2px">Note</span>
-        <span class="print-note">${notes}</span>
-      </div>` : ''}
-
+  const name=esc(it.exerciseName||it.name||'Esercizio');
+  const kgId=esc(it.id||it.itemId||('it_'+Math.random().toString(36).slice(2)));
+  const tech=techniqueLabel(it);
+  const notes=esc(it.notes||it.note||'');
+  const rest=hhmm(it.restMin,it.restSec);
+  const eq=getEquipment(it);
+  return`
+  <div class="item">
+    <div class="item-name">${SVG_DBELL}<b>${name}</b>${eq?`<span class="tag">${esc(eq)}</span>`:''}</div>
+    ${tech?`<div class="tech"><span class="tag">${esc(tech)}</span></div>`:''}
+    <div class="sep"></div>
+    <div class="grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;">
+      <div><div class="lab">Serie</div><div class="val">${esc(it.sets??'')}</div></div>
+      <div><div class="lab">Ripetizioni</div><div class="val">${esc(it.reps??'')}</div></div>
+      <div><div class="lab">Kg</div><div class="val"><input class="kg" data-kg="${kgId}" type="number" step="0.5" value="${esc(it.kg??'')}"></div></div>
+      <div><div class="lab">Recupero</div><div class="val">${rest}</div></div>
     </div>
+    ${notes?`<div class="note" style="margin-top:10px;"><b>Note:</b> ${notes}</div>`:''}
   </div>`;
 }
-
-/* Importa e salva la scheda */
 function importPlan(){
-  const inp = Object.assign(document.createElement('input'), {type:'file', accept:'.ptplan,.json,application/json'});
-  inp.onchange = async ()=>{
-    const f = inp.files?.[0]; if(!f) return;
+  const inp=Object.assign(document.createElement('input'),{type:'file',accept:'.ptplan,.json,application/json'});
+  inp.onchange=async()=>{
+    const f=inp.files?.[0];if(!f)return;
     try{
-      const txt = await f.text();
-      const data = JSON.parse(txt);
-      const p = data.plan || data;
-      if(!p || !Array.isArray(p.days)) throw new Error('File non valido: mancano i giorni.');
-      plan = p;
-      try{ localStorage.setItem(LS_PLAN_KEY, JSON.stringify({plan:p})); }catch{}
-      render();
-      alert('Scheda importata.');
-    }catch(e){
-      alert('Import fallito: '+e.message);
-    }
+      const txt=await f.text();
+      const data=JSON.parse(txt);
+      const p=data.plan||data;
+      if(!p||!Array.isArray(p.days))throw new Error('File non valido.');
+      plan=p;localStorage.setItem(LS_PLAN_KEY,JSON.stringify({plan:p}));
+      render();alert('Scheda importata.');
+    }catch(e){alert('Errore: '+e.message);}
   };
   inp.click();
 }
-
-function printPDF(){
-  if(!plan) return alert('Importa prima una scheda.');
-  window.print();
-}
-
+function printPDF(){if(!plan)return alert('Importa prima una scheda.');window.print();}
 function resetLocal(){
-  if(!plan) return alert('Importa prima una scheda.');
-  if(!confirm('Vuoi cancellare i Kg modificati e i numeri di Settimana salvati su questo dispositivo?')) return;
-  localOver = {weekByDayId:{}, kgByItemId:{}};
-  saveOverrides();
-  render();
+  if(!plan)return alert('Importa prima una scheda.');
+  if(!confirm('Vuoi cancellare i Kg modificati e i numeri di Settimana?'))return;
+  localOver={weekByDayId:{},kgByItemId:{}};saveOverrides();render();
 }
-
-/* Avvio: ricarica l'ultima scheda salvata se esiste */
 (function init(){
   try{
-    const raw = localStorage.getItem(LS_PLAN_KEY);
-    if(raw){
-      const data = JSON.parse(raw);
-      const saved = data.plan || data;
-      if(saved && Array.isArray(saved.days)){
-        plan = saved;
-      }
+    const raw=localStorage.getItem(LS_PLAN_KEY);
+    if(raw){const data=JSON.parse(raw);const saved=data.plan||data;
+      if(saved&&Array.isArray(saved.days))plan=saved;
     }
   }catch{}
   render();
 })();
-
-$('#btn-import').addEventListener('click', importPlan);
-$('#btn-print').addEventListener('click', printPDF);
-$('#btn-reset').addEventListener('click', resetLocal);
-
+$('#btn-import').addEventListener('click',importPlan);
+$('#btn-print').addEventListener('click',printPDF);
+$('#btn-reset').addEventListener('click',resetLocal);
 })();
 </script>
-
-<!-- Registra il service worker (necessario per installazione/icone) -->
 <script src="sw-register.js" defer></script>
 </body>
 </html>
