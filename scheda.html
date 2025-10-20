@@ -75,7 +75,10 @@ button.primary:hover{background:var(--brand);color:#fff}
   border-radius:3px;
   padding:4px 8px;
   text-align:center;
-  width:100%;
+  width:90px;
+  overflow:hidden;         /* ✅ Evita che il testo esca dai bordi */
+  white-space:nowrap;
+  text-overflow:ellipsis;
 }
 .val{
   font-size:1rem;
@@ -84,8 +87,7 @@ button.primary:hover{background:var(--brand);color:#fff}
   text-align:center;
 }
 .val input[type="number"]{
-  width:100%;
-  max-width:90px;
+  width:90px;
   background:#fff;
   color:var(--text);
   border:2px solid var(--border);
@@ -107,27 +109,20 @@ button.primary:hover{background:var(--brand);color:#fff}
 .meta{font-size:0.9rem;color:var(--muted);}
 .tech{margin-top:6px}
 
-/* ✅ Layout uniforme e centrato */
 .grid{
   display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  justify-items:center;
+  grid-template-columns: repeat(3, 90px);
+  justify-content:center;
   align-items:start;
   gap:16px;
   margin-top:8px;
-}
-
-.grid > div{
-  width:90px;
-  text-align:center;
 }
 
 @media(max-width:600px){
   .item{padding:12px}
   .day{padding:12px}
   .day-title h2{font-size:1.05rem}
-  .grid{gap:12px}
-  .grid > div{width:90px;}
+  .grid{gap:10px}
 }
 </style>
 </head>
