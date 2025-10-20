@@ -22,7 +22,7 @@
   --accent:#4864aa;
   --brand:#a01818;
   --ok:#2ea44f;
-  --divider:#b22222; /* ✅ linea di separazione tra giorni */
+  --divider:#3b4b65; /* ✅ nuovo colore divisore più neutro e leggibile */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Inter',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
@@ -44,34 +44,35 @@ button.primary{border-color:var(--brand);color:var(--brand);}
 button.primary:hover{background:var(--brand);color:#fff}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:16px;}
 
-/* ✅ Giorni più separati visivamente */
+/* ✅ Giorni con separazione più visibile */
 .day{
   background:var(--card);
   border:2px solid var(--border-strong);
   border-radius:12px;
   padding:18px;
-  margin:28px 0;
+  margin:34px 0;
   box-shadow:0 3px 8px rgba(0,0,0,0.08);
   position:relative;
 }
 
-/* ✅ Divisore colorato tra i giorni */
+/* ✅ Divisore tra i giorni migliorato */
 .day::after{
   content:"";
   display:block;
-  height:4px;
+  height:6px;
   width:100%;
-  background:var(--divider);
-  border-radius:4px;
+  background:linear-gradient(90deg,var(--divider) 0%,#64748b 100%);
+  border-radius:3px;
   position:absolute;
-  bottom:-14px;
+  bottom:-18px;
   left:0;
+  box-shadow:0 2px 5px rgba(59,75,101,0.4);
 }
 
 /* Titolo giorno più grande */
 .day-title h2{
   margin:0;
-  font-size:1.4rem; /* ✅ più grande */
+  font-size:1.4rem;
   font-weight:700;
   color:#000;
 }
