@@ -4,183 +4,54 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scheda Cliente</title>
-
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="SB Training">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#faf7f2">
+<meta name="theme-color" content="#fefaf5">
 
 <style>
-:root{
-  --bg:#faf7f2;
-  --card:#ffffff;
-  --text:#0f1a2d;
-  --muted:#6c7480;
-  --border:#d2d2d2;
-  --border-strong:#b3b3b3;
-  --accent:#4864aa;
-  --brand:#a01818;
-  --ok:#2ea44f;
-  --divider:#3b4b65; /* ✅ nuovo colore divisore più neutro e leggibile */
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Inter',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
-button,input{font:inherit}
-.wrap{max-width:900px;margin:0 auto;padding:16px}
-.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap}
-button{
-  border:1.5px solid var(--accent);
-  background:transparent;
-  color:var(--accent);
-  border-radius:8px;
-  padding:8px 14px;
-  cursor:pointer;
-  transition:all .2s ease;
-}
-button:hover{background:var(--accent);color:#fff}
-button.primary{border-color:var(--brand);color:var(--brand);}
-button.primary:hover{background:var(--brand);color:#fff}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.05);padding:16px;}
-
-/* ✅ Giorni con separazione più visibile */
-.day{
-  background:var(--card);
-  border:2px solid var(--border-strong);
-  border-radius:12px;
-  padding:18px;
-  margin:34px 0;
-  box-shadow:0 3px 8px rgba(0,0,0,0.08);
-  position:relative;
-}
-
-/* ✅ Divisore tra i giorni migliorato */
-.day::after{
-  content:"";
-  display:block;
-  height:6px;
-  width:100%;
-  background:linear-gradient(90deg,var(--divider) 0%,#64748b 100%);
-  border-radius:3px;
-  position:absolute;
-  bottom:-18px;
-  left:0;
-  box-shadow:0 2px 5px rgba(59,75,101,0.4);
-}
-
-/* Titolo giorno più grande */
-.day-title h2{
+body{
   margin:0;
-  font-size:1.4rem;
-  font-weight:700;
-  color:#000;
+  font-family:'Inter',Arial,sans-serif;
+  background:#fefaf5;
+  color:#111;
 }
-.day-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.week-edit{display:flex;align-items:center;gap:8px}
-.week-edit .label{font-weight:600;color:var(--text)}
-.week-edit input{
-  width:70px;text-align:center;
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:6px 8px;
-  background:#fff;
-  color:var(--text);
-}
-
-/* Riquadro esercizio marcato */
-.item{
-  border:2px solid var(--border-strong);
-  border-radius:10px;
-  padding:16px;
-  margin:16px 0;
-  background:var(--card);
-  box-shadow:0 2px 5px rgba(0,0,0,0.06);
-}
-.item-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.item-name b{font-size:1.1rem;color:var(--text);}
-.ico-db{width:22px;height:22px;flex:0 0 22px}
-.tag{
-  background:#f0f2f5;
-  color:var(--accent);
-  border-radius:999px;
-  font-size:0.85rem;
-  padding:3px 8px;
-}
-.lab{
-  font-size:.9rem;
-  font-weight:600;
-  color:#fff;
-  background:var(--brand);
-  border:1px solid #000;
-  border-radius:3px;
-  padding:4px 8px;
-  text-align:center;
-  width:90px;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-}
-.val{
-  font-size:1rem;
-  font-weight:600;
-  color:var(--text);
-  text-align:center;
-}
-.val input[type="number"]{
-  width:90px;
-  background:#fff;
-  color:var(--text);
-  border:2px solid var(--border);
-  border-radius:6px;
-  padding:6px 0;
-  text-align:center;
-}
-.val input.kg{border-color:var(--ok)}
-.val input[type="number"]:focus{border-color:var(--brand);outline:none}
-.sep{height:1px;background:#ececec;margin:12px 0}
-.note{
-  background:#f9f9f9;
-  border-radius:8px;
-  padding:8px 10px;
-  font-size:0.95rem;
-  color:#2b2b2b;
-  font-weight:600;
-}
-.meta{font-size:0.9rem;color:var(--muted);}
+.wrap{max-width:1000px;margin:0 auto;padding:20px}
+.header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:2rem;color:#0b1220}
+button{padding:8px 14px;border:2px solid #203070;border-radius:10px;font-weight:600;background:none;color:#203070;cursor:pointer}
+button.primary{border-color:#800;background:#800;color:#fff}
+.card{background:#fff;border:2px solid #ccc;border-radius:14px;padding:16px;margin-top:10px;box-shadow:0 2px 5px rgba(0,0,0,.05)}
+.day{border:2px solid #bbb;border-radius:14px;padding:14px;margin:24px 0;background:#fff}
+.day-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.day h2{margin:0;font-size:1.5rem;color:#000}
+.week-edit input{border:1px solid #999;border-radius:8px;padding:4px 8px;width:60px;text-align:center}
+.item{border:2px solid #d0d0d0;border-radius:12px;padding:10px;margin:16px 0;background:#fff}
+.item-name{display:flex;align-items:center;gap:10px}
+.item-name b{font-size:1.25rem;color:#111}
+.tag{background:#eef1fa;padding:3px 8px;border-radius:999px;font-size:0.85rem;color:#334}
+.lab-box{display:flex;gap:6px;justify-content:space-between;text-align:center;margin-top:10px}
+.lab{flex:1;background:#7b0000;color:#fff;font-weight:700;border:1px solid #000;padding:4px 0;border-radius:6px}
+.val{flex:1;text-align:center;margin-top:4px}
+.val input{width:70%;max-width:100px;text-align:center;border:2px solid #090;border-radius:8px;padding:4px;font-size:1rem}
+.note{background:#f4f4f4;border-radius:10px;padding:8px 10px;margin-top:10px;font-size:0.95rem}
+.divider{height:6px;background:#b22;margin:40px 0;border-radius:3px}
 .tech{margin-top:6px}
-
-.grid{
-  display:grid;
-  grid-template-columns: repeat(3, 90px);
-  justify-content:center;
-  align-items:start;
-  gap:16px;
-  margin-top:8px;
-}
-
-@media(max-width:600px){
-  .item{padding:12px}
-  .day{padding:12px}
-  .day-title h2{font-size:1.25rem}
-  .grid{gap:10px}
-}
 </style>
 </head>
-
 <body>
 <div class="wrap">
   <div class="header">
     <h1>Scheda Cliente</h1>
-    <div class="toolbar">
-      <button id="btn-import" class="primary" type="button">Importa scheda (.ptplan)</button>
-      <button id="btn-print" type="button">Stampa / PDF</button>
-      <button id="btn-reset" type="button">Reset modifiche</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="primary" id="btn-import">Importa scheda (.ptplan)</button>
+      <button id="btn-print">Stampa / PDF</button>
+      <button id="btn-reset">Reset modifiche</button>
     </div>
   </div>
-
   <div id="content" class="card">
-    <p class="meta">Importa il file .ptplan ricevuto dal coach per visualizzare la scheda. Potrai modificare solo i <b>Kg</b> e il numero di <b>Settimana</b>.</p>
+    <p>Importa il file .ptplan ricevuto dal coach per visualizzare la scheda. Potrai modificare solo i <b>Kg</b> e il numero di <b>Settimana</b>.</p>
   </div>
 </div>
 
@@ -189,133 +60,108 @@ button.primary:hover{background:var(--brand);color:#fff}
 'use strict';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-const SVG_DBELL=`<svg class="ico-db" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="1.5" y="6" width="4" height="12" rx="1" fill="#a01818" stroke="#000" stroke-width="0.5"/><rect x="18.5" y="6" width="4" height="12" rx="1" fill="#a01818" stroke="#000" stroke-width="0.5"/><rect x="6" y="10.5" width="12" height="3" rx="1" fill="#6b0000" stroke="#000" stroke-width="0.5"/></svg>`;
 let plan=null;
-const LS_OVR_KEY='client_overrides_v19';
 const LS_PLAN_KEY='client_saved_plan_v1';
+const LS_OVR_KEY='client_overrides_v19';
 let localOver={weekByDayId:{},kgByItemId:{}};
-try{localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||localOver;}catch{}
+try{localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||{weekByDayId:{},kgByItemId:{}};}catch{}
 
-function saveOverrides(){localStorage.setItem(LS_OVR_KEY,JSON.stringify(localOver));}
+function techniqueLabel(item){
+  const t = item.technique || item.tecnica || '';
+  if(!t) return '';
+  const pair = (item.techPairName || item.techniquePairName || item.pairedExerciseName || item.pairExerciseName || item.pairedName || '');
+  // 🔧 FIX: mostra l'esercizio accanto al tipo di tecnica (Superset → esercizio collegato)
+  return pair ? `${t} – ${pair}` : t;
+}
 
-function readEquipmentFromItem(it){
-  const keys=['equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'];
-  for(const k of keys){if(it&&it[k])return String(it[k]);}return'';
+function hhmm(min,sec){
+  if(!min && !sec) return '-';
+  const mm = String(min||0).padStart(2,'0');
+  const ss = String(sec||0).padStart(2,'0');
+  return `${mm}:${ss}`;
 }
-function readEquipmentFromLibrary(exerciseId){
-  if(!exerciseId||!plan||!Array.isArray(plan.exercises))return'';
-  const lib=plan.exercises.find(e=>e.id===exerciseId||e.exerciseId===exerciseId);
-  if(!lib)return'';
-  const keys=['equipment','attrezzo','tool','machine','equipmentType','equip','device','attrezzatura'];
-  for(const k of keys){if(lib[k])return String(lib[k]);}
-  if(lib.meta&&(lib.meta.equipment||lib.meta.attrezzo))return String(lib.meta.equipment||lib.meta.attrezzo);
-  return'';
-}
-function getEquipment(it){return readEquipmentFromItem(it)||readEquipmentFromLibrary(it.exerciseId||it.id)||'';}
-function techniqueLabel(item){const t=item.technique||item.tecnica||'';if(!t)return'';const p=item.techPairName||item.pairedExerciseName||'';return p?`${t} → ${p}`:t;}
-function hhmm(m,s){if(!m&&!s)return'-';const mm=String(m||0).padStart(2,'0');const ss=String(s||0).padStart(2,'0');return`${mm}:${ss}`;}
 
 function render(){
   const host=$('#content');
-  if(!plan){host.innerHTML=`<p class="meta">Importa il file .ptplan ricevuto dal coach per visualizzare la scheda.</p>`;return;}
+  if(!plan){host.innerHTML=`<p>Importa il file .ptplan ricevuto dal coach per visualizzare la scheda.</p>`;return;}
   const title=esc(plan.title||plan.client||'Scheda');
-  let html=`<h2 style="margin-bottom:10px;font-weight:600">${title}</h2>`;
-  (plan.days||[]).forEach(day=>{
-    const dayId=day.id||day.dayId||('d_'+Math.random().toString(36).slice(2));
+  let html=`<h2 style="margin-top:0">${title}</h2>`;
+  (plan.days||[]).forEach((day,idx)=>{
+    const dayId=day.id||'d_'+idx;
     const weekNum=localOver.weekByDayId[dayId]??day.week??1;
-    const dayName=esc(day.name||'');
     html+=`
+    ${idx>0?'<div class="divider"></div>':''}
     <div class="day" data-day="${dayId}">
       <div class="day-head">
-        <div class="day-title"><h2>${dayName}</h2></div>
+        <h2>${esc(day.name||'Giorno '+(idx+1))}</h2>
         <div class="week-edit">
-          <span class="label">SETTIMANA</span>
-          <input type="number" min="1" step="1" value="${weekNum}" data-week="${dayId}">
+          <span style="font-weight:700">SETTIMANA</span>
+          <input type="number" min="1" step="1" value="${weekNum}">
         </div>
       </div>
-      ${(day.items||[]).map(it=>renderItem(it)).join('<div class="sep"></div>')}
+      ${(day.items||[]).map(it=>renderItem(it)).join('')}
     </div>`;
   });
   host.innerHTML=html;
-  (plan.days||[]).forEach(day=>{
-    const dayId=day.id||day.dayId;
-    const wkInp=host.querySelector(`input[data-week="${CSS.escape(dayId)}"]`);
-    if(wkInp)wkInp.addEventListener('input',()=>{
-      let v=parseInt(wkInp.value,10);if(isNaN(v)||v<1)v=1;
-      localOver.weekByDayId[dayId]=v;saveOverrides();
-    });
-    (day.items||[]).forEach(it=>{
-      const kgId=it.id||it.itemId;
-      const inp=host.querySelector(`input[data-kg="${CSS.escape(kgId)}"]`);
-      if(inp){
-        const initial=localOver.kgByItemId[kgId];
-        if(initial!=null)inp.value=initial;
-        inp.addEventListener('input',()=>{
-          localOver.kgByItemId[kgId]=inp.value;saveOverrides();
-        });
-      }
-    });
-  });
 }
+
 function renderItem(it){
   const name=esc(it.exerciseName||it.name||'Esercizio');
   const kgId=esc(it.id||it.itemId||('it_'+Math.random().toString(36).slice(2)));
   const tech=techniqueLabel(it);
   const notes=esc(it.notes||it.note||'');
   const rest=hhmm(it.restMin,it.restSec);
-  const eq=getEquipment(it);
-  const series=it.sets??'';
-  const reps=it.reps??'';
-  const combo=series&&reps?`${series}×${reps}`:(series||reps||'');
-
-  return`
+  const reps=esc(it.reps||'');
+  const sets=esc(it.sets||'');
+  const serieRep=sets?(sets+'×'+reps):reps;
+  return `
   <div class="item">
-    <div class="item-name">${SVG_DBELL}<b>${name}</b>${eq?`<span class="tag">${esc(eq)}</span>`:''}</div>
-    ${tech?`<div class="tech"><span class="tag">${esc(tech)}</span></div>`:''}
-    <div class="sep"></div>
-    <div class="grid">
-      <div><div class="lab">Serie/Rep</div><div class="val">${combo}</div></div>
-      <div><div class="lab">Kg</div><div class="val"><input class="kg" data-kg="${kgId}" type="number" step="0.5" value="${esc(it.kg??'')}"></div></div>
-      <div><div class="lab">Rec</div><div class="val">${rest}</div></div>
+    <div class="item-name"><b>${name}</b>${tech?`<span class="tag">${tech}</span>`:''}</div>
+    <div class="lab-box">
+      <div class="lab">Serie/Rep</div>
+      <div class="lab">Kg</div>
+      <div class="lab">Rec</div>
     </div>
-    ${notes?`<div class="note" style="margin-top:10px;"><b>Note:</b> ${notes}</div>`:''}
+    <div class="lab-box">
+      <div class="val">${serieRep}</div>
+      <div class="val"><input data-kg="${kgId}" type="number" value="${esc(it.kg??'')}"></div>
+      <div class="val">${rest}</div>
+    </div>
+    ${notes?`<div class="note"><b>Note:</b> ${notes}</div>`:''}
   </div>`;
 }
-function importPlan(){
-  const inp=Object.assign(document.createElement('input'),{type:'file',accept:'.ptplan,.json,application/json'});
+
+$('#btn-import').addEventListener('click',()=>{
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='.json,.ptplan';
   inp.onchange=async()=>{
     const f=inp.files?.[0];if(!f)return;
     try{
       const txt=await f.text();
       const data=JSON.parse(txt);
       const p=data.plan||data;
-      if(!p||!Array.isArray(p.days))throw new Error('File non valido.');
-      plan=p;localStorage.setItem(LS_PLAN_KEY,JSON.stringify({plan:p}));
-      render();alert('Scheda importata.');
-    }catch(e){alert('Errore: '+e.message);}
+      plan=p;
+      localStorage.setItem(LS_PLAN_KEY,JSON.stringify({plan:p}));
+      render();
+    }catch(e){alert('Errore importazione: '+e.message);}
   };
   inp.click();
-}
-function printPDF(){if(!plan)return alert('Importa prima una scheda.');window.print();}
-function resetLocal(){
-  if(!plan)return alert('Importa prima una scheda.');
-  if(!confirm('Vuoi cancellare i Kg modificati e i numeri di Settimana?'))return;
-  localOver={weekByDayId:{},kgByItemId:{}};saveOverrides();render();
-}
+});
+$('#btn-print').addEventListener('click',()=>window.print());
+$('#btn-reset').addEventListener('click',()=>{
+  localOver={weekByDayId:{},kgByItemId:{}};
+  localStorage.removeItem(LS_OVR_KEY);
+  render();
+});
+
 (function init(){
   try{
     const raw=localStorage.getItem(LS_PLAN_KEY);
-    if(raw){const data=JSON.parse(raw);const saved=data.plan||data;
-      if(saved&&Array.isArray(saved.days))plan=saved;
-    }
+    if(raw){const data=JSON.parse(raw);plan=data.plan||data;}
   }catch{}
   render();
 })();
-$('#btn-import').addEventListener('click',importPlan);
-$('#btn-print').addEventListener('click',printPDF);
-$('#btn-reset').addEventListener('click',resetLocal);
 })();
 </script>
-<script src="sw-register.js" defer></script>
 </body>
 </html>
