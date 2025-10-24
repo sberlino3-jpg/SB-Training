@@ -66,11 +66,14 @@ const LS_OVR_KEY='client_overrides_v19';
 let localOver={weekByDayId:{},kgByItemId:{}};
 try{localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||{weekByDayId:{},kgByItemId:{}};}catch{}
 
+function saveOverrides(){
+  localStorage.setItem(LS_OVR_KEY, JSON.stringify(localOver));
+}
+
 function techniqueLabel(item){
   const t = item.technique || item.tecnica || '';
   if(!t) return '';
   const pair = (item.techPairName || item.techniquePairName || item.pairedExerciseName || item.pairExerciseName || item.pairedName || '');
-  // 🔧 FIX: mostra l'esercizio accanto al tipo di tecnica (Superset → esercizio collegato)
   return pair ? `${t} – ${pair}` : t;
 }
 
@@ -99,13 +102,39 @@ function render(){
           <input type="number" min="1" step="1" value="${weekNum}">
         </div>
       </div>
-      ${(day.items||[]).map(it=>renderItem(it)).join('')}
+      ${(day.items||[]).map(it=>renderItem(it,dayId)).join('')}
     </div>`;
   });
   host.innerHTML=html;
+
+  // collego eventi sugli input Kg e Settimana
+  (plan.days||[]).forEach(day=>{
+    const dayId=day.id||'d_'+Math.random();
+    const weekInput = host.querySelector(`[data-day="${dayId}"] .week-edit input`);
+    if(weekInput){
+      weekInput.addEventListener('input',()=>{
+        let v=parseInt(weekInput.value,10);
+        if(isNaN(v)||v<1) v=1;
+        localOver.weekByDayId[dayId]=v;
+        saveOverrides();
+      });
+    }
+    (day.items||[]).forEach(it=>{
+      const kgId=it.id||it.itemId;
+      const inp=host.querySelector(`input[data-kg="${CSS.escape(kgId)}"]`);
+      if(inp){
+        // se abbiamo un valore salvato, lo impostiamo
+        if(localOver.kgByItemId[kgId]!=null) inp.value=localOver.kgByItemId[kgId];
+        inp.addEventListener('input',()=>{
+          localOver.kgByItemId[kgId]=inp.value;
+          saveOverrides();
+        });
+      }
+    });
+  });
 }
 
-function renderItem(it){
+function renderItem(it,dayId){
   const name=esc(it.exerciseName||it.name||'Esercizio');
   const kgId=esc(it.id||it.itemId||('it_'+Math.random().toString(36).slice(2)));
   const tech=techniqueLabel(it);
@@ -114,6 +143,7 @@ function renderItem(it){
   const reps=esc(it.reps||'');
   const sets=esc(it.sets||'');
   const serieRep=sets?(sets+'×'+reps):reps;
+  const storedKg = localOver.kgByItemId[kgId] ?? it.kg ?? '';
   return `
   <div class="item">
     <div class="item-name"><b>${name}</b>${tech?`<span class="tag">${tech}</span>`:''}</div>
@@ -124,7 +154,7 @@ function renderItem(it){
     </div>
     <div class="lab-box">
       <div class="val">${serieRep}</div>
-      <div class="val"><input data-kg="${kgId}" type="number" value="${esc(it.kg??'')}"></div>
+      <div class="val"><input data-kg="${kgId}" type="number" value="${esc(storedKg)}"></div>
       <div class="val">${rest}</div>
     </div>
     ${notes?`<div class="note"><b>Note:</b> ${notes}</div>`:''}
