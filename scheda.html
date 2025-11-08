@@ -107,7 +107,7 @@ function render(){
   });
   host.innerHTML=html;
 
-  // collego eventi sugli input Kg e Settimana
+  // eventi su Kg e Settimana
   (plan.days||[]).forEach(day=>{
     const dayId=day.id||'d_'+Math.random();
     const weekInput = host.querySelector(`[data-day="${dayId}"] .week-edit input`);
@@ -123,7 +123,6 @@ function render(){
       const kgId=it.id||it.itemId;
       const inp=host.querySelector(`input[data-kg="${CSS.escape(kgId)}"]`);
       if(inp){
-        // se abbiamo un valore salvato, lo impostiamo
         if(localOver.kgByItemId[kgId]!=null) inp.value=localOver.kgByItemId[kgId];
         inp.addEventListener('input',()=>{
           localOver.kgByItemId[kgId]=inp.value;
@@ -161,22 +160,31 @@ function renderItem(it,dayId){
   </div>`;
 }
 
+// 🔧 FIX: compatibilità iOS per import file .ptplan
 $('#btn-import').addEventListener('click',()=>{
-  const inp=document.createElement('input');
-  inp.type='file';inp.accept='.json,.ptplan';
-  inp.onchange=async()=>{
-    const f=inp.files?.[0];if(!f)return;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = isIOS ? '*/*' : '.ptplan,.json,application/json,application/octet-stream,text/plain';
+
+  inp.onchange = async ()=>{
+    const f = inp.files?.[0]; if(!f) return;
     try{
-      const txt=await f.text();
-      const data=JSON.parse(txt);
-      const p=data.plan||data;
-      plan=p;
-      localStorage.setItem(LS_PLAN_KEY,JSON.stringify({plan:p}));
+      const txt = await f.text();
+      const data = JSON.parse(txt);
+      const p = data.plan || data;
+      plan = p;
+      localStorage.setItem(LS_PLAN_KEY, JSON.stringify({plan:p}));
       render();
-    }catch(e){alert('Errore importazione: '+e.message);}
+    }catch(e){
+      alert('Errore importazione: '+e.message+'\nSe usi iPhone, rinomina il file in .json e riprova.');
+    }
   };
   inp.click();
 });
+
 $('#btn-print').addEventListener('click',()=>window.print());
 $('#btn-reset').addEventListener('click',()=>{
   localOver={weekByDayId:{},kgByItemId:{}};
