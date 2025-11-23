@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scheda Cliente</title>
+
+<!-- PWA -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="SB Training">
@@ -23,21 +25,48 @@ h1{margin:0;font-size:2rem;color:#0b1220}
 button{padding:8px 14px;border:2px solid #203070;border-radius:10px;font-weight:600;background:none;color:#203070;cursor:pointer}
 button.primary{border-color:#800;background:#800;color:#fff}
 .card{background:#fff;border:2px solid #ccc;border-radius:14px;padding:16px;margin-top:10px;box-shadow:0 2px 5px rgba(0,0,0,.05)}
+
 .day{border:2px solid #bbb;border-radius:14px;padding:14px;margin:24px 0;background:#fff}
 .day-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .day h2{margin:0;font-size:1.5rem;color:#000}
 .week-edit input{border:1px solid #999;border-radius:8px;padding:4px 8px;width:60px;text-align:center}
+
+/* CARD ESERCIZIO */
 .item{border:2px solid #d0d0d0;border-radius:12px;padding:10px;margin:16px 0;background:#fff}
 .item-name{display:flex;align-items:center;gap:10px}
 .item-name b{font-size:1.25rem;color:#111}
 .tag{background:#eef1fa;padding:3px 8px;border-radius:999px;font-size:0.85rem;color:#334}
+
 .lab-box{display:flex;gap:6px;justify-content:space-between;text-align:center;margin-top:10px}
 .lab{flex:1;background:#7b0000;color:#fff;font-weight:700;border:1px solid #000;padding:4px 0;border-radius:6px}
 .val{flex:1;text-align:center;margin-top:4px}
 .val input{width:70%;max-width:100px;text-align:center;border:2px solid #090;border-radius:8px;padding:4px;font-size:1rem}
+
+/* NOTE COACH (non modificabili) */
 .note{background:#f4f4f4;border-radius:10px;padding:8px 10px;margin-top:10px;font-size:0.95rem}
+
+/* NOTE CLIENTE (modificabili) */
+.client-note{margin-top:8px}
+.client-note-label{
+  font-weight:600;
+  font-size:0.9rem;
+  color:#333;
+  display:block;
+  margin-bottom:4px;
+}
+.client-note textarea{
+  width:100%;
+  min-height:60px;
+  border:1px solid #bbb;
+  border-radius:8px;
+  padding:6px;
+  font-family:inherit;
+  font-size:0.9rem;
+  resize:vertical;
+}
+
+/* divisore tra i giorni */
 .divider{height:6px;background:#b22;margin:40px 0;border-radius:3px}
-.tech{margin-top:6px}
 </style>
 </head>
 <body>
@@ -57,148 +86,184 @@ button.primary{border-color:#800;background:#800;color:#fff}
 
 <script>
 (function(){
-'use strict';
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-let plan=null;
-const LS_PLAN_KEY='client_saved_plan_v1';
-const LS_OVR_KEY='client_overrides_v19';
-let localOver={weekByDayId:{},kgByItemId:{}};
-try{localOver=JSON.parse(localStorage.getItem(LS_OVR_KEY))||{weekByDayId:{},kgByItemId:{}};}catch{}
+  'use strict';
 
-function saveOverrides(){
-  localStorage.setItem(LS_OVR_KEY, JSON.stringify(localOver));
-}
+  function $(s){ return document.querySelector(s); }
 
-function techniqueLabel(item){
-  const t = item.technique || item.tecnica || '';
-  if(!t) return '';
-  const pair = (item.techPairName || item.techniquePairName || item.pairedExerciseName || item.pairExerciseName || item.pairedName || '');
-  return pair ? `${t} – ${pair}` : t;
-}
-
-function hhmm(min,sec){
-  if(!min && !sec) return '-';
-  const mm = String(min||0).padStart(2,'0');
-  const ss = String(sec||0).padStart(2,'0');
-  return `${mm}:${ss}`;
-}
-
-function render(){
-  const host=$('#content');
-  if(!plan){host.innerHTML=`<p>Importa il file .ptplan ricevuto dal coach per visualizzare la scheda.</p>`;return;}
-  const title=esc(plan.title||plan.client||'Scheda');
-  let html=`<h2 style="margin-top:0">${title}</h2>`;
-  (plan.days||[]).forEach((day,idx)=>{
-    const dayId=day.id||'d_'+idx;
-    const weekNum=localOver.weekByDayId[dayId]??day.week??1;
-    html+=`
-    ${idx>0?'<div class="divider"></div>':''}
-    <div class="day" data-day="${dayId}">
-      <div class="day-head">
-        <h2>${esc(day.name||'Giorno '+(idx+1))}</h2>
-        <div class="week-edit">
-          <span style="font-weight:700">SETTIMANA</span>
-          <input type="number" min="1" step="1" value="${weekNum}">
-        </div>
-      </div>
-      ${(day.items||[]).map(it=>renderItem(it,dayId)).join('')}
-    </div>`;
-  });
-  host.innerHTML=html;
-
-  // eventi su Kg e Settimana
-  (plan.days||[]).forEach(day=>{
-    const dayId=day.id||'d_'+Math.random();
-    const weekInput = host.querySelector(`[data-day="${dayId}"] .week-edit input`);
-    if(weekInput){
-      weekInput.addEventListener('input',()=>{
-        let v=parseInt(weekInput.value,10);
-        if(isNaN(v)||v<1) v=1;
-        localOver.weekByDayId[dayId]=v;
-        saveOverrides();
-      });
-    }
-    (day.items||[]).forEach(it=>{
-      const kgId=it.id||it.itemId;
-      const inp=host.querySelector(`input[data-kg="${CSS.escape(kgId)}"]`);
-      if(inp){
-        if(localOver.kgByItemId[kgId]!=null) inp.value=localOver.kgByItemId[kgId];
-        inp.addEventListener('input',()=>{
-          localOver.kgByItemId[kgId]=inp.value;
-          saveOverrides();
-        });
-      }
+  function esc(s){
+    if (s === undefined || s === null) s = '';
+    return String(s).replace(/[&<>]/g,function(m){
+      return m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;');
     });
-  });
-}
+  }
 
-function renderItem(it,dayId){
-  const name=esc(it.exerciseName||it.name||'Esercizio');
-  const kgId=esc(it.id||it.itemId||('it_'+Math.random().toString(36).slice(2)));
-  const tech=techniqueLabel(it);
-  const notes=esc(it.notes||it.note||'');
-  const rest=hhmm(it.restMin,it.restSec);
-  const reps=esc(it.reps||'');
-  const sets=esc(it.sets||'');
-  const serieRep=sets?(sets+'×'+reps):reps;
-  const storedKg = localOver.kgByItemId[kgId] ?? it.kg ?? '';
-  return `
-  <div class="item">
-    <div class="item-name"><b>${name}</b>${tech?`<span class="tag">${tech}</span>`:''}</div>
-    <div class="lab-box">
-      <div class="lab">Serie/Rep</div>
-      <div class="lab">Kg</div>
-      <div class="lab">Rec</div>
-    </div>
-    <div class="lab-box">
-      <div class="val">${serieRep}</div>
-      <div class="val"><input data-kg="${kgId}" type="number" value="${esc(storedKg)}"></div>
-      <div class="val">${rest}</div>
-    </div>
-    ${notes?`<div class="note"><b>Note:</b> ${notes}</div>`:''}
-  </div>`;
-}
+  var plan = null;
+  var LS_PLAN_KEY = 'client_saved_plan_v1';
 
-// 🔧 FIX: compatibilità iOS per import file .ptplan
-$('#btn-import').addEventListener('click',()=>{
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-    || (navigator.userAgent.includes('Mac') && 'ontouchend' in document);
+  function techniqueLabel(item){
+    var t = item.technique || item.tecnica || '';
+    if(!t) return '';
+    var pair =
+      item.techPairName ||
+      item.techniquePairName ||
+      item.pairedExerciseName ||
+      item.pairExerciseName ||
+      item.pairedName || '';
+    return pair ? (t + ' – ' + pair) : t;
+  }
 
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = isIOS ? '*/*' : '.ptplan,.json,application/json,application/octet-stream,text/plain';
+  function hhmm(min,sec){
+    if(!min && !sec) return '-';
+    var mm = String(min || 0); if(mm.length<2) mm='0'+mm;
+    var ss = String(sec || 0); if(ss.length<2) ss='0'+ss;
+    return mm + ':' + ss;
+  }
 
-  inp.onchange = async ()=>{
-    const f = inp.files?.[0]; if(!f) return;
-    try{
-      const txt = await f.text();
-      const data = JSON.parse(txt);
-      const p = data.plan || data;
-      plan = p;
-      localStorage.setItem(LS_PLAN_KEY, JSON.stringify({plan:p}));
-      render();
-    }catch(e){
-      alert('Errore importazione: '+e.message+'\nSe usi iPhone, rinomina il file in .json e riprova.');
+  function render(){
+    var host = $('#content');
+    if(!plan){
+      host.innerHTML =
+        '<p>Importa il file .ptplan ricevuto dal coach per visualizzare la scheda. ' +
+        'Potrai modificare solo i <b>Kg</b> e il numero di <b>Settimana</b>.</p>';
+      return;
     }
-  };
-  inp.click();
-});
 
-$('#btn-print').addEventListener('click',()=>window.print());
-$('#btn-reset').addEventListener('click',()=>{
-  localOver={weekByDayId:{},kgByItemId:{}};
-  localStorage.removeItem(LS_OVR_KEY);
-  render();
-});
+    var title = esc(plan.title || plan.client || 'Scheda');
+    var html = '<h2 style="margin-top:0">' + title + '</h2>';
 
-(function init(){
-  try{
-    const raw=localStorage.getItem(LS_PLAN_KEY);
-    if(raw){const data=JSON.parse(raw);plan=data.plan||data;}
-  }catch{}
-  render();
-})();
+    var days = plan.days || [];
+    for(var i=0;i<days.length;i++){
+      var day = days[i];
+      var dayId = day.id || ('d_' + i);
+      var weekNum = (day.week === undefined || day.week === null) ? 1 : day.week;
+      var dayName = esc(day.name || ('Giorno ' + (i+1)));
+
+      if(i>0) html += '<div class="divider"></div>';
+
+      html += '<div class="day" data-day="'+dayId+'">' +
+                '<div class="day-head">' +
+                  '<h2>'+dayName+'</h2>' +
+                  '<div class="week-edit">' +
+                    '<span style="font-weight:700">SETTIMANA</span>' +
+                    '<input type="number" min="1" step="1" value="'+weekNum+'">' +
+                  '</div>' +
+                '</div>';
+
+      var items = day.items || [];
+      for(var j=0;j<items.length;j++){
+        html += renderItem(items[j]);
+      }
+
+      html += '</div>';
+    }
+
+    host.innerHTML = html;
+  }
+
+  function renderItem(it){
+    var name = esc(it.exerciseName || it.name || 'Esercizio');
+    var kgId = esc(it.id || it.itemId || ('it_'+Math.random().toString(36).slice(2)));
+    var tech = techniqueLabel(it);
+    var notes = esc(it.notes || it.note || '');
+    var rest = hhmm(it.restMin, it.restSec);
+    var reps = esc(it.reps || '');
+    var sets = esc(it.sets || '');
+    var serieRep = sets ? (sets + '×' + reps) : reps;
+
+    var html = '';
+    html += '<div class="item">';
+    html +=   '<div class="item-name"><b>'+name+'</b>';
+    if(tech){
+      html += ' <span class="tag">'+tech+'</span>';
+    }
+    html +=   '</div>';
+
+    html +=   '<div class="lab-box">' +
+                '<div class="lab">Serie/Rep</div>' +
+                '<div class="lab">Kg</div>' +
+                '<div class="lab">Rec</div>' +
+              '</div>';
+
+    html +=   '<div class="lab-box">' +
+                '<div class="val">'+serieRep+'</div>' +
+                '<div class="val"><input data-kg="'+kgId+'" type="number" value="'+esc(it.kg === undefined || it.kg === null ? '' : it.kg)+'"></div>' +
+                '<div class="val">'+rest+'</div>' +
+              '</div>';
+
+    if(notes){
+      html += '<div class="note"><b>Note:</b> '+notes+'</div>';
+    }
+
+    html += '<div class="client-note">' +
+              '<span class="client-note-label">Note cliente</span>' +
+              '<textarea placeholder="Scrivi qui le tue note (sensazioni, difficoltà, ecc.)"></textarea>' +
+            '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  function importPlan(){
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.ptplan,.json,application/json';
+
+    inp.onchange = function(){
+      var files = inp.files;
+      if(!files || !files.length) return;
+      var f = files[0];
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        try{
+          var txt = e.target.result;
+          var data = JSON.parse(txt);
+          var p = data.plan || data;
+          if(!p || !p.days || !p.days.length){
+            alert('File non valido: struttura inesperata.');
+            return;
+          }
+          plan = p;
+          try{
+            localStorage.setItem(LS_PLAN_KEY, JSON.stringify({plan:p}));
+          }catch(err){}
+          render();
+        }catch(err){
+          alert('Errore durante la lettura del file: ' + err.message);
+        }
+      };
+      reader.readAsText(f);
+    };
+
+    inp.click();
+  }
+
+  function printPDF(){ window.print(); }
+
+  function resetAll(){ location.reload(); }
+
+  function init(){
+    try{
+      var raw = localStorage.getItem(LS_PLAN_KEY);
+      if(raw){
+        var data = JSON.parse(raw);
+        var saved = data.plan || data;
+        if(saved && saved.days && saved.days.length){
+          plan = saved;
+        }
+      }
+    }catch(e){}
+    render();
+  }
+
+  // collego i pulsanti
+  document.addEventListener('DOMContentLoaded', function(){
+    $('#btn-import').addEventListener('click', importPlan);
+    $('#btn-print').addEventListener('click', printPDF);
+    $('#btn-reset').addEventListener('click', resetAll);
+    init();
+  });
+
 })();
 </script>
 </body>
