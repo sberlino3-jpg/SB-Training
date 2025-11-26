@@ -97,13 +97,13 @@ button.primary{border-color:#800;background:#800;color:#fff}
     });
   }
 
-  /* 👉 NUOVO: genera un "ID esercizio" stabile dal nome */
+  /* 👉 ID esercizio stabile dal nome */
   function getExerciseUID(name){
     if(!name) return '';
     return String(name)
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g,'_')   // tutto ciò che non è lettera/numero → "_"
-      .replace(/^_+|_+$/g,'');      // togli _ iniziali/finali
+      .replace(/[^a-z0-9]+/g,'_')
+      .replace(/^_+|_+$/g,'');
   }
 
   var plan = null;
@@ -201,15 +201,13 @@ button.primary{border-color:#800;background:#800;color:#fff}
   function renderItem(it){
     var name = esc(it.exerciseName || it.name || 'Esercizio');
 
-    /* 👉 ID stabile per l'esercizio basato sul nome */
     var nameForId = it.exerciseName || it.name || '';
     var exerciseUID = getExerciseUID(nameForId);
     if(!exerciseUID){
-      // fallback: usa id/itemId se proprio manca il nome
       exerciseUID = (it.id || it.itemId || ('it_'+Math.random().toString(36).slice(2)));
     }
-    var kgKey = exerciseUID;         // chiave logica per salvare i Kg
-    var kgIdAttr = esc(kgKey);       // usato in data-kg
+    var kgKey = exerciseUID;
+    var kgIdAttr = esc(kgKey);
 
     var tech = techniqueLabel(it);
     var notes = esc(it.notes || it.note || '');
@@ -257,11 +255,9 @@ button.primary{border-color:#800;background:#800;color:#fff}
     return html;
   }
 
-  /* collega input settimana / Kg per salvare in localStorage */
   function wireInteractions(){
     var host = $('#content');
 
-    // settimane
     var weekInputs = host.querySelectorAll('input[data-week]');
     for(var i=0;i<weekInputs.length;i++){
       (function(inp){
@@ -275,11 +271,10 @@ button.primary{border-color:#800;background:#800;color:#fff}
       })(weekInputs[i]);
     }
 
-    // Kg (ora salvati per exerciseUID)
     var kgInputs = host.querySelectorAll('input[data-kg]');
     for(var j=0;j<kgInputs.length;j++){
       (function(inp){
-        var kgId = inp.getAttribute('data-kg'); // è l'exerciseUID
+        var kgId = inp.getAttribute('data-kg');
         inp.addEventListener('input', function(){
           localOver.kgByItemId[kgId] = inp.value;
           saveOverrides();
@@ -288,11 +283,11 @@ button.primary{border-color:#800;background:#800;color:#fff}
     }
   }
 
-  /* Import con compatibilità iPhone (input nel DOM) */
+  /* IMPORT: cambiato SOLO accept per permettere .ptplan su iOS */
   function importPlan(){
     var inp = document.createElement('input');
     inp.type = 'file';
-    inp.accept = '.ptplan,.json,application/json';
+    inp.accept = '';             // <-- QUI: niente filtro, così iOS fa selezionare il .ptplan
     inp.style.display = 'none';
     document.body.appendChild(inp);
 
@@ -334,7 +329,6 @@ button.primary{border-color:#800;background:#800;color:#fff}
   function printPDF(){ window.print(); }
 
   function resetAll(){
-    // ricarica la pagina (pulisce i valori a schermo ma lascia il piano salvato)
     location.reload();
   }
 
