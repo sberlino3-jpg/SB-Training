@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="it">
 <head>
@@ -35,7 +34,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
 /* CARD ESERCIZIO */
 .item{border:2px solid #d0d0d0;border-radius:12px;padding:10px;margin:16px 0;background:#fff}
 
-/* ✅ MODIFICA: struttura titolo esercizio + meta (muscolo • attrezzo) */
+/* titolo esercizio + meta (muscolo • attrezzo) */
 .item-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .item-title{display:flex;flex-direction:column;gap:4px;min-width:0}
 .item-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -157,6 +156,40 @@ button.primary{border-color:#800;background:#800;color:#fff}
     return mm + ':' + ss;
   }
 
+  /* ✅ FIX: fallback robusto per Serie/Rep e Recupero (per file/schede con campi diversi) */
+  function normalizeSetsReps(it){
+    var sr = it.setsReps || it.sets_rep || it.serieRep || it.serie_reps || it.seriesReps || it.series_reps || '';
+    if(sr && typeof sr === 'string') return sr.trim();
+
+    var sets = (it.sets !== undefined && it.sets !== null) ? String(it.sets).trim() : '';
+    var reps = (it.reps !== undefined && it.reps !== null) ? String(it.reps).trim() : '';
+
+    if(sets && reps) return sets + '×' + reps;
+    if(reps) return reps;
+
+    // ulteriore fallback: se esiste "schemes" (array tipo [{s:2,r:10}]) prova a mostrare il primo
+    if(Array.isArray(it.schemes) && it.schemes.length){
+      var first = it.schemes[0];
+      if(first && (first.s || first.r)){
+        var s = first.s ? String(first.s) : '';
+        var r = first.r ? String(first.r) : '';
+        if(s && r) return s + '×' + r;
+      }
+    }
+    return '';
+  }
+
+  function normalizeRec(it){
+    // se nel JSON/ptplan esiste già una stringa tipo "02:00" usala
+    var r = it.rec || it.recovery || it.rest || it.recupero || it.restTime || '';
+    if(r && typeof r === 'string'){
+      r = r.trim();
+      if(r) return r;
+    }
+    // altrimenti usa restMin/restSec
+    return hhmm(it.restMin, it.restSec);
+  }
+
   function render(){
     var host = $('#content');
     if(!plan){
@@ -218,10 +251,10 @@ button.primary{border-color:#800;background:#800;color:#fff}
 
     var tech = techniqueLabel(it);
     var notes = esc(it.notes || it.note || '');
-    var rest = hhmm(it.restMin, it.restSec);
-    var reps = esc(it.reps || '');
-    var sets = esc(it.sets || '');
-    var serieRep = sets ? (sets + '×' + reps) : reps;
+
+    /* ✅ FIX: serie/rep + recupero robusti */
+    var serieRep = esc(normalizeSetsReps(it));
+    var rest = esc(normalizeRec(it));
 
     var baseKg = (it.kg === undefined || it.kg === null) ? '' : it.kg;
     var overKg = localOver.kgByItemId[kgKey];
@@ -229,7 +262,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
       baseKg = overKg;
     }
 
-    /* ✅ MODIFICA: mostra muscolo • attrezzo come nell’editor */
+    /* mostra muscolo • attrezzo */
     var mRaw = (it.muscle || '');
     var eRaw = (it.equipment || '');
     var mUp = mRaw ? String(mRaw).toUpperCase() : '';
@@ -260,9 +293,9 @@ button.primary{border-color:#800;background:#800;color:#fff}
               '</div>';
 
     html +=   '<div class="lab-box">' +
-                '<div class="val">'+serieRep+'</div>' +
+                '<div class="val">'+(serieRep || '-')+'</div>' +
                 '<div class="val"><input data-kg="'+kgIdAttr+'" type="number" value="'+esc(baseKg)+'"></div>' +
-                '<div class="val">'+rest+'</div>' +
+                '<div class="val">'+(rest || '-')+'</div>' +
               '</div>';
 
     if(notes){
@@ -381,4 +414,3 @@ button.primary{border-color:#800;background:#800;color:#fff}
 </script>
 </body>
 </html>
-```
