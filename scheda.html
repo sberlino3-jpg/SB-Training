@@ -167,7 +167,6 @@ button.primary{border-color:#800;background:#800;color:#fff}
     if(sets && reps) return sets + '×' + reps;
     if(reps) return reps;
 
-    // ulteriore fallback: se esiste "schemes" (array tipo [{s:2,r:10}]) prova a mostrare il primo
     if(Array.isArray(it.schemes) && it.schemes.length){
       var first = it.schemes[0];
       if(first && (first.s || first.r)){
@@ -180,13 +179,11 @@ button.primary{border-color:#800;background:#800;color:#fff}
   }
 
   function normalizeRec(it){
-    // se nel JSON/ptplan esiste già una stringa tipo "02:00" usala
     var r = it.rec || it.recovery || it.rest || it.recupero || it.restTime || '';
     if(r && typeof r === 'string'){
       r = r.trim();
       if(r) return r;
     }
-    // altrimenti usa restMin/restSec
     return hhmm(it.restMin, it.restSec);
   }
 
@@ -228,7 +225,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
 
       var items = day.items || [];
       for(var j=0;j<items.length;j++){
-        html += renderItem(items[j]);
+        html += renderItem(items[j], dayId, j); /* ✅ PASSO dayId + index (solo per chiave Kg stabile) */
       }
 
       html += '</div>';
@@ -238,21 +235,22 @@ button.primary{border-color:#800;background:#800;color:#fff}
     wireInteractions();
   }
 
-  function renderItem(it){
+  /* ✅ MODIFICA SOLO QUI: chiave Kg stabile per item */
+  function renderItem(it, dayId, index){
     var name = esc(it.exerciseName || it.name || 'Esercizio');
 
     var nameForId = it.exerciseName || it.name || '';
     var exerciseUID = getExerciseUID(nameForId);
-    if(!exerciseUID){
-      exerciseUID = (it.id || it.itemId || ('it_'+Math.random().toString(36).slice(2)));
-    }
-    var kgKey = exerciseUID;
+
+    // ✅ PRIORITÀ: id/itemId del piano (stabile) → se manca fallback deterministico
+    var stableItemId = it.id || it.itemId || it.exerciseItemId || '';
+    var kgKey = stableItemId ? String(stableItemId) : (exerciseUID ? (exerciseUID + '__' + dayId + '__' + index) : ('it__' + dayId + '__' + index));
+
     var kgIdAttr = esc(kgKey);
 
     var tech = techniqueLabel(it);
     var notes = esc(it.notes || it.note || '');
 
-    /* ✅ FIX: serie/rep + recupero robusti */
     var serieRep = esc(normalizeSetsReps(it));
     var rest = esc(normalizeRec(it));
 
@@ -262,7 +260,6 @@ button.primary{border-color:#800;background:#800;color:#fff}
       baseKg = overKg;
     }
 
-    /* mostra muscolo • attrezzo */
     var mRaw = (it.muscle || '');
     var eRaw = (it.equipment || '');
     var mUp = mRaw ? String(mRaw).toUpperCase() : '';
@@ -343,7 +340,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
   function importPlan(){
     var inp = document.createElement('input');
     inp.type = 'file';
-    inp.accept = '';             // <-- QUI: niente filtro, così iOS fa selezionare il .ptplan
+    inp.accept = '';
     inp.style.display = 'none';
     document.body.appendChild(inp);
 
