@@ -115,18 +115,19 @@ button.primary{border-color:#800;background:#800;color:#fff}
   var plan = null;
   var LS_PLAN_KEY = 'client_saved_plan_v1';
 
-  /* salvataggio Kg / Settimane */
+  /* salvataggio Kg / Settimane / Note cliente */
   var LS_OVR_KEY = 'client_overrides_v19';
-  var localOver = { kgByItemId:{}, weekByDayId:{} };
+  var localOver = { kgByItemId:{}, weekByDayId:{}, noteByItemId:{} };
 
   function loadOverrides(){
     try{
       var raw = localStorage.getItem(LS_OVR_KEY);
       if(raw){
-        var obj = JSON.parse(raw);
-        if(obj && obj.kgByItemId && obj.weekByDayId){
-          localOver = obj;
-        }
+        var obj = JSON.parse(raw) || {};
+        if(!obj.kgByItemId) obj.kgByItemId = {};
+        if(!obj.weekByDayId) obj.weekByDayId = {};
+        if(!obj.noteByItemId) obj.noteByItemId = {};
+        localOver = obj;
       }
     }catch(e){}
   }
@@ -156,7 +157,6 @@ button.primary{border-color:#800;background:#800;color:#fff}
     return mm + ':' + ss;
   }
 
-  /* ✅ FIX: fallback robusto per Serie/Rep e Recupero (per file/schede con campi diversi) */
   function normalizeSetsReps(it){
     var sr = it.setsReps || it.sets_rep || it.serieRep || it.serie_reps || it.seriesReps || it.series_reps || '';
     if(sr && typeof sr === 'string') return sr.trim();
@@ -225,7 +225,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
 
       var items = day.items || [];
       for(var j=0;j<items.length;j++){
-        html += renderItem(items[j], dayId, j); /* ✅ PASSO dayId + index (solo per chiave Kg stabile) */
+        html += renderItem(items[j], dayId, j);  /* passa dayId+index */
       }
 
       html += '</div>';
@@ -235,18 +235,22 @@ button.primary{border-color:#800;background:#800;color:#fff}
     wireInteractions();
   }
 
-  /* ✅ MODIFICA SOLO QUI: chiave Kg stabile per item */
-  function renderItem(it, dayId, index){
-    var name = esc(it.exerciseName || it.name || 'Esercizio');
+  /* chiave stabile: id/itemId del piano → fallback deterministico */
+  function stableKeyForItem(it, dayId, index){
+    var stableItemId = it.id || it.itemId || it.exerciseItemId || '';
+    if(stableItemId) return String(stableItemId);
 
     var nameForId = it.exerciseName || it.name || '';
     var exerciseUID = getExerciseUID(nameForId);
 
-    // ✅ PRIORITÀ: id/itemId del piano (stabile) → se manca fallback deterministico
-    var stableItemId = it.id || it.itemId || it.exerciseItemId || '';
-    var kgKey = stableItemId ? String(stableItemId) : (exerciseUID ? (exerciseUID + '__' + dayId + '__' + index) : ('it__' + dayId + '__' + index));
+    if(exerciseUID) return (exerciseUID + '__' + dayId + '__' + index);
+    return ('it__' + dayId + '__' + index);
+  }
 
-    var kgIdAttr = esc(kgKey);
+  function renderItem(it, dayId, index){
+    var name = esc(it.exerciseName || it.name || 'Esercizio');
+    var key = stableKeyForItem(it, dayId, index);
+    var keyAttr = esc(key);
 
     var tech = techniqueLabel(it);
     var notes = esc(it.notes || it.note || '');
@@ -255,10 +259,14 @@ button.primary{border-color:#800;background:#800;color:#fff}
     var rest = esc(normalizeRec(it));
 
     var baseKg = (it.kg === undefined || it.kg === null) ? '' : it.kg;
-    var overKg = localOver.kgByItemId[kgKey];
+    var overKg = localOver.kgByItemId[key];
     if(overKg !== undefined && overKg !== null && overKg !== ''){
       baseKg = overKg;
     }
+
+    /* ✅ NUOVO: note cliente persistenti */
+    var clientNote = localOver.noteByItemId[key];
+    if(clientNote === undefined || clientNote === null) clientNote = '';
 
     var mRaw = (it.muscle || '');
     var eRaw = (it.equipment || '');
@@ -270,7 +278,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
     }
 
     var html = '';
-    html += '<div class="item" data-item="'+kgIdAttr+'">';
+    html += '<div class="item" data-item="'+keyAttr+'">';
 
     html +=   '<div class="item-header">';
     html +=     '<div class="item-title">';
@@ -291,7 +299,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
 
     html +=   '<div class="lab-box">' +
                 '<div class="val">'+(serieRep || '-')+'</div>' +
-                '<div class="val"><input data-kg="'+kgIdAttr+'" type="number" value="'+esc(baseKg)+'"></div>' +
+                '<div class="val"><input data-kg="'+keyAttr+'" type="number" value="'+esc(baseKg)+'"></div>' +
                 '<div class="val">'+(rest || '-')+'</div>' +
               '</div>';
 
@@ -301,7 +309,7 @@ button.primary{border-color:#800;background:#800;color:#fff}
 
     html += '<div class="client-note">' +
               '<span class="client-note-label">Note cliente</span>' +
-              '<textarea placeholder="Scrivi qui le tue note (sensazioni, difficoltà, ecc.)"></textarea>' +
+              '<textarea data-note="'+keyAttr+'" placeholder="Scrivi qui le tue note (sensazioni, difficoltà, ecc.)">'+esc(clientNote)+'</textarea>' +
             '</div>';
 
     html += '</div>';
@@ -327,16 +335,28 @@ button.primary{border-color:#800;background:#800;color:#fff}
     var kgInputs = host.querySelectorAll('input[data-kg]');
     for(var j=0;j<kgInputs.length;j++){
       (function(inp){
-        var kgId = inp.getAttribute('data-kg');
+        var k = inp.getAttribute('data-kg');
         inp.addEventListener('input', function(){
-          localOver.kgByItemId[kgId] = inp.value;
+          localOver.kgByItemId[k] = inp.value;
           saveOverrides();
         });
       })(kgInputs[j]);
     }
+
+    /* ✅ SOLO QUESTA AGGIUNTA: salva Note cliente */
+    var noteAreas = host.querySelectorAll('textarea[data-note]');
+    for(var k=0;k<noteAreas.length;k++){
+      (function(ta){
+        var id = ta.getAttribute('data-note');
+        ta.addEventListener('input', function(){
+          localOver.noteByItemId[id] = ta.value;
+          saveOverrides();
+        });
+      })(noteAreas[k]);
+    }
   }
 
-  /* IMPORT: cambiato SOLO accept per permettere .ptplan su iOS */
+  /* IMPORT: accept vuoto per iOS */
   function importPlan(){
     var inp = document.createElement('input');
     inp.type = 'file';
